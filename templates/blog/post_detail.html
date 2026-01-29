@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<article class="post-detail">
+    <h1>{{ post.title }}</h1>
+
+    <p class="meta">
+        Автор: {{ post.author.full_name }} · {{ post.created_at|date:"d.m.Y" }}
+    </p>
+
+    {% if post.image %}
+        <img
+            src="{{ post.image.url }}"
+            alt="{{ post.title }}"
+            class="post-image"
+        >
+    {% endif %}
+
+    <div class="content">
+        {{ post.content|linebreaks }}
+    </div>
+
+    {% if user == post.author %}
+        <a class="btn" href="{% url 'blog:edit' slug=post.slug %}">
+            ✏️ Редактировать
+        </a>
+    {% endif %}
+</article>
+{% endblock %}
