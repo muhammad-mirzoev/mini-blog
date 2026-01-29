@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Mini Blog{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+{% include 'includes/navbar.html' %}
+{% include 'includes/messages.html' %}
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>
