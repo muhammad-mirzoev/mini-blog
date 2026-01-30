@@ -2,41 +2,43 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 
 from .models import Post
 from .forms import PostCreateForm
 
 
 def post_list_view(request):
-    posts = (
-        Post.objects
-        .published()
-        .select_related('author')
-    )
+    posts = Post.objects.published()
+
+    if request.user.is_authenticated:
+        drafts = Post.objects.filter(
+            author=request.user,
+            status=Post.Status.DRAFT
+        )
+    else:
+        drafts = Post.objects.none()
 
     return render(
         request,
         'blog/post_list.html',
         {
             'posts': posts,
+            'drafts': drafts,
         }
     )
 
 
 def post_detail_view(request, slug):
-    post = get_object_or_404(
-        Post.objects.select_related('author'),
-        slug=slug,
-        status=Post.Status.PUBLISHED
-    )
+    post = get_object_or_404(Post, slug=slug)
+
+    if post.status == Post.Status.DRAFT and post.author != request.user:
+        raise Http404
 
     return render(
         request,
         'blog/post_detail.html',
-        {
-            'post': post,
-        }
+        {'post': post}
     )
 
 
@@ -107,3 +109,19 @@ def post_edit_view(request, slug):
             'title': 'Редактирование поста',
         }
     )
+
+
+@login_required
+@require_POST
+def post_delete_view(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+
+    if post.author != request.user:
+        return HttpResponseForbidden(
+            'Вы не можете удалить этот пост'
+        )
+
+    post.delete()
+    messages.success(request, 'Пост удалён')
+
+    return redirect('blog:list')
