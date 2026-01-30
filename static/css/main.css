@@ -191,6 +191,16 @@ p {
     border-radius: 14px;
 }
 
+.btn.danger {
+    background: var(--danger);
+}
+
+.post-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 12px;
+}
+
 /* ===== FORMS ===== */
 form {
     background: var(--bg-card);

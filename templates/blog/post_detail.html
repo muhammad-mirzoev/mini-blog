@@ -23,9 +23,27 @@
     </div>
 
     {% if user == post.author %}
+    <div class="post-actions">
         <a class="btn" href="{% url 'blog:edit' slug=post.slug %}">
             ✏️ Редактировать
         </a>
-    {% endif %}
+
+        <form
+            action="{% url 'blog:delete' slug=post.slug %}"
+            method="post"
+            style="display:inline;"
+        >
+            {% csrf_token %}
+            <button
+                type="submit"
+                class="btn danger"
+                onclick="return confirm('Удалить пост? Это действие нельзя отменить.')"
+            >
+                🗑 Удалить
+            </button>
+        </form>
+    </div>
+{% endif %}
+
 </article>
 {% endblock %}
